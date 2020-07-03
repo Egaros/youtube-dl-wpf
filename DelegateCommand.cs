@@ -18,8 +18,12 @@ namespace youtube_dl_wpf
 
         public bool CanExecute(object parameter) => _canExecuteAction?.Invoke(parameter) ?? true;
 
-        public event EventHandler? CanExecuteChanged;
+        public event EventHandler CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
 
-        public void InvokeCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        public void InvokeCanExecuteChanged() => CommandManager.InvalidateRequerySuggested();
     }
 }
