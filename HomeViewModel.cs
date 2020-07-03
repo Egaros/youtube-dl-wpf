@@ -50,7 +50,6 @@ namespace youtube_dl_wpf
 
         private StringBuilder outputString = null!;
         private bool _freezeButton = false; // true for freezing the button
-        private BackgroundWorker worker = null!;
         private Process dlProcess = null!;
 
         private readonly ISnackbarMessageQueue _snackbarMessageQueue;
@@ -74,12 +73,15 @@ namespace youtube_dl_wpf
             dlProcess.StartInfo.UseShellExecute = false;
             dlProcess.StartInfo.RedirectStandardError = true;
             dlProcess.StartInfo.RedirectStandardOutput = true;
+            dlProcess.EnableRaisingEvents = true;
             dlProcess.ErrorDataReceived += DlOutputHandler;
             dlProcess.OutputDataReceived += DlOutputHandler;
+            dlProcess.Exited += DlProcess_Exited;
         }
 
-        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void DlProcess_Exited(object? sender, EventArgs e)
         {
+            dlProcess.Dispose();
             FreezeButton = false;
             _startDownload.InvokeCanExecuteChanged();
             _listFormats.InvokeCanExecuteChanged();
@@ -127,14 +129,6 @@ namespace youtube_dl_wpf
             _listFormats.InvokeCanExecuteChanged();
             _abortDl.InvokeCanExecuteChanged();
 
-            worker = new BackgroundWorker();
-            worker.DoWork += DoStartDownload;
-            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
-            worker.RunWorkerAsync();
-        }
-
-        private void DoStartDownload(object sender, DoWorkEventArgs e)
-        {
             outputString = new StringBuilder();
             PrepareDlProcess();
 
@@ -183,7 +177,6 @@ namespace youtube_dl_wpf
                 dlProcess.Start();
                 dlProcess.BeginErrorReadLine();
                 dlProcess.BeginOutputReadLine();
-                dlProcess.WaitForExit();
             }
             catch (Exception ex)
             {
@@ -193,7 +186,6 @@ namespace youtube_dl_wpf
             }
             finally
             {
-                dlProcess.Dispose();
             }
         }
 
@@ -204,14 +196,6 @@ namespace youtube_dl_wpf
             _listFormats.InvokeCanExecuteChanged();
             _abortDl.InvokeCanExecuteChanged();
 
-            worker = new BackgroundWorker();
-            worker.DoWork += DoListFormats;
-            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
-            worker.RunWorkerAsync();
-        }
-
-        private void DoListFormats(object sender, DoWorkEventArgs e)
-        {
             outputString = new StringBuilder();
             PrepareDlProcess();
 
@@ -229,7 +213,6 @@ namespace youtube_dl_wpf
                 dlProcess.Start();
                 dlProcess.BeginErrorReadLine();
                 dlProcess.BeginOutputReadLine();
-                dlProcess.WaitForExit();
             }
             catch (Exception ex)
             {
@@ -239,7 +222,6 @@ namespace youtube_dl_wpf
             }
             finally
             {
-                dlProcess.Dispose();
             }
         }
 
@@ -282,14 +264,6 @@ namespace youtube_dl_wpf
             _listFormats.InvokeCanExecuteChanged();
             _abortDl.InvokeCanExecuteChanged();
 
-            worker = new BackgroundWorker();
-            worker.DoWork += DoUpdateDl;
-            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
-            worker.RunWorkerAsync();
-        }
-
-        private void DoUpdateDl(object sender, DoWorkEventArgs e)
-        {
             outputString = new StringBuilder();
             PrepareDlProcess();
 
@@ -306,7 +280,6 @@ namespace youtube_dl_wpf
                 dlProcess.Start();
                 dlProcess.BeginErrorReadLine();
                 dlProcess.BeginOutputReadLine();
-                dlProcess.WaitForExit();
             }
             catch (Exception ex)
             {
@@ -316,7 +289,6 @@ namespace youtube_dl_wpf
             }
             finally
             {
-                dlProcess.Dispose();
             }
         }
 
