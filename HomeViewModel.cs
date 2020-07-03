@@ -83,9 +83,7 @@ namespace youtube_dl_wpf
         {
             dlProcess.Dispose();
             FreezeButton = false;
-            _startDownload.InvokeCanExecuteChanged();
-            _listFormats.InvokeCanExecuteChanged();
-            _abortDl.InvokeCanExecuteChanged();
+            CommandManager.InvalidateRequerySuggested();
         }
 
         private void OnBrowseFolder(object commandParameter)
@@ -125,9 +123,7 @@ namespace youtube_dl_wpf
         private void OnStartDownload(object commandParameter)
         {
             FreezeButton = true;
-            _startDownload.InvokeCanExecuteChanged();
-            _listFormats.InvokeCanExecuteChanged();
-            _abortDl.InvokeCanExecuteChanged();
+            CommandManager.InvalidateRequerySuggested();
 
             outputString = new StringBuilder();
             PrepareDlProcess();
@@ -192,9 +188,7 @@ namespace youtube_dl_wpf
         private void OnListFormats(object commandParameter)
         {
             FreezeButton = true;
-            _startDownload.InvokeCanExecuteChanged();
-            _listFormats.InvokeCanExecuteChanged();
-            _abortDl.InvokeCanExecuteChanged();
+            CommandManager.InvalidateRequerySuggested();
 
             outputString = new StringBuilder();
             PrepareDlProcess();
@@ -260,9 +254,7 @@ namespace youtube_dl_wpf
         private void UpdateDl()
         {
             FreezeButton = true;
-            _startDownload.InvokeCanExecuteChanged();
-            _listFormats.InvokeCanExecuteChanged();
-            _abortDl.InvokeCanExecuteChanged();
+            CommandManager.InvalidateRequerySuggested();
 
             outputString = new StringBuilder();
             PrepareDlProcess();
@@ -308,10 +300,9 @@ namespace youtube_dl_wpf
             set
             {
                 SetProperty(ref _link, value);
-                _startDownload.InvokeCanExecuteChanged();
-                _listFormats.InvokeCanExecuteChanged();
                 if (String.IsNullOrEmpty(AppSettings.settings.DlPath))
                     _snackbarMessageQueue.Enqueue("youtube-dl path is not set. Go to settings and set the path.");
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -389,7 +380,7 @@ namespace youtube_dl_wpf
             set
             {
                 SetProperty(ref _downloadPath, value);
-                _openFolder.InvokeCanExecuteChanged();
+                CommandManager.InvalidateRequerySuggested();
                 AppSettings.settings.DownloadPath = _downloadPath;
                 AppSettings.SaveSettings();
             }
